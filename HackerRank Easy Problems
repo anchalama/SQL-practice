@@ -1,0 +1,187 @@
+-- Challenge: "African Cities"
+-- Given the CITY and COUNTRY tables, query the names of all cities where the 
+-- CONTINENT is 'Africa'.
+
+select
+    city.name
+from city
+left join country
+on city.countrycode = country.code
+where country.continent = 'Africa';
+
+-- Challenge: "Average Population of Each Continent"
+-- Given the CITY and COUNTRY tables, query the names of all the continents 
+-- (COUNTRY.Continent) and their respective average city populations (CITY.Population) 
+-- rounded down to the nearest integer.
+
+select
+    country.continent,
+    floor(avg(city.population))
+from country
+inner join city
+on country.code = city.countrycode
+group by country.continent;
+
+-- Challenge: "Higher Than 75 Marks"
+-- Query the Name of any student in STUDENTS who scored higher than 75 Marks. 
+-- Order your output by the last three characters of each name. 
+-- If two or more students both have names ending in the same last three characters 
+-- (i.e.: Bobby, Robby, etc.), secondary sort them by ascending ID.
+
+select
+    name
+from students
+where marks > 75
+order by right(name, 3), id; 
+
+-- Challenge: "Population Census"
+-- Given the CITY and COUNTRY tables, query the sum of the populations 
+-- of all cities where the CONTINENT is 'Asia'.
+
+select
+    sum(city.population)
+from city
+inner join country
+on city.countrycode = country.code
+where country.continent = 'Asia';
+
+-- Challenge: "Weather Observation Station 10"
+-- Query the list of CITY names from STATION that do not end with vowels. 
+-- Your result cannot contain duplicates.
+
+select 
+    distinct city
+from station
+where city not like '%a'
+    and city not like '%e'
+    and city not like '%i'
+    and city not like '%o'
+    and city not like '%u';
+
+-- Challenge: "Top Earners"
+-- We define an employee's total earnings to be their monthly salary x months worked,
+-- and the maximum total earnings to be the maximum total earnings for any employee 
+-- in the Employee table. 
+-- Write a query to find the maximum total earnings for all employees as well as 
+-- the total number of employees who have maximum total earnings. 
+-- Then print these values as 2 space-separated integers.
+
+select
+    salary * months as total_earnings,
+    count(*)
+from employee
+group by total_earnings
+order by total_earnings desc
+limit 1;
+
+-- Challenge: "Weather Observation Station 9"
+-- Query the list of city names from STATION that do not start with vowels. 
+-- Your result cannot contain duplicates. 
+
+select 
+    distinct city
+from station 
+where city not like 'a%'
+    and city not like 'e%'
+    and city not like 'i%'
+    and city not like 'o%'
+    and city not like 'u%';
+
+-- Challenge: "Weather Observation Station 11"
+-- Query the list of city names from STATION that either do not start with 
+-- vowels or do not end with vowels. Your result cannot contain duplicates.
+
+select 
+    distinct city
+from station
+where city not regexp('^[aeiou]')
+    or city not regexp('[aeiou]$');
+
+-- Challenge: "Weather Observation Station 12"
+-- Query the list of city names from STATION that do not start with vowels
+-- and do not end with vowels. Your result cannot contain duplicates.
+
+select 
+    distinct city
+from station
+where city not regexp('^[aeiou]')
+    and city not regexp('[aeiou]$');
+
+-- Challenge: "Type of Triangle"
+-- Write a query identifying the type of each record in the TRIANGLES table
+-- using its three side lengths. Output one of the following statements
+-- for each record in the table: 
+-- #1: Equilateral: It's a triangle with 3 sides of equal length. 
+-- #2: Isoscles: It's a triangle with 2 sides of equal length. 
+-- #3: Scalene: It's a triangle with 3 sides of differing lengths. 
+-- #4: Not a Triangle: The given values of A, B, and C don't form a triangle.
+
+select
+    case
+        when A + B <= C or B + C <= A or A + C <= B then 'Not A Triangle'
+        when A = B and B = C and A = C then 'Equilateral'
+        when A != B  and B != C and A != C and A + B > C then 'Scalene'
+        else 'Isosceles'
+    end as triangle_type
+from triangles;
+
+-- Challenge: "Weather Observation Station 2"
+-- Query the following two values from the STATION table: 
+-- 1. The sum of all values in lat_n rounded to a scale of 2 decimal places.
+-- 2. The sum of all values in long_w rounded to a scale of 2 decimal places.
+
+select 
+    round(sum(lat_n), 2), 
+    round(sum(long_w), 2)
+from station;
+
+-- Challenge: "Weather Observation Station 13"
+-- Query the sum of northern latitudes (lat_n) from STATION having values
+-- greater than 38.7880 and less than 137.2345. Truncate your answer to
+-- 4 decimal places. 
+
+select
+    round(sum(lat_n), 4)
+from station
+where lat_n > 38.7880
+    and lat_n < 137.2345;
+
+-- Challenge: "Weather Observation Station 14"
+-- Query the greatest value of the northern latitudes (lat_n) from STATION
+-- that is less than 137.2345. Truncate your answer to 4 decimal places. 
+
+select 
+    round(max(lat_n), 4)
+from station
+where lat_n < 137.2345;
+
+-- Challenge: "Weather Observation Station 15"
+-- Query the western longitude (long_w) for the largest northern_latitude (lat_n)
+-- in STATION that is less than 137.2345. Round your answer to 4 decimal places. 
+
+select
+    round(long_w, 4)
+from station
+where lat_n < 137.2345
+order by lat_n desc
+limit 1;
+
+-- Challenge: "Weather Observation Station 16"
+-- Query the smallest northern latitude (lat_n) from STATION that is greater
+-- than 38.7780. Round your answer to 4 decimal places. 
+
+select 
+    round(min(lat_n), 4)
+from station
+where lat_n > 38.7780;
+
+-- Challenge: "Weather Observation Station 17"
+-- Query the western longitude (long_w) where the smallest northern latitude (lat_n)
+-- in STATION is greater than 38.7780. Round your answer to 4 decimal places.
+
+select 
+    round(long_w, 4)
+from station
+where lat_n > 38.7780
+order by lat_n asc
+limit 1;
