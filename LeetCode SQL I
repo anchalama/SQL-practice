@@ -1,0 +1,287 @@
+-- Problem 595: Big Countries
+-- A country is big if: it has an area of at least three million 
+-- or it has a population of at least twenty-five million.
+-- Write an SQL query to report the name, population, and area 
+-- of the big countries.
+
+select
+    name, 
+    population, 
+    area 
+from World
+where area >= 3000000 
+    or population >= 25000000;
+
+-- Problem 1757: Recyclable and Low Fat Products
+-- Write an SQL query to find the ids of products that are both 
+-- low fat and recyclable.
+
+select product_id from products
+where low_fats = "Y"
+    and recyclable = "Y";
+
+-- Problem 584: Find Customer Referee
+-- Write an SQL query to report the names of the customer 
+-- that are not referred by the customer with id = 2.
+
+select name from customer
+where referee_id not in(2)
+    or referee_id is null;
+
+-- Problem 183: Customers Who Never Order
+-- Write an SQL query to report all customers who never order anything.
+
+select name as Customers
+from Customers
+where id not in (
+    select customerId from Orders
+);
+
+-- Problem 1873: Calculate Special Bonus
+-- Write an SQL query to calculate the bonus of each employee. 
+-- The bonus of an employee is 100% of their salary if the ID of the 
+-- employee is an odd number and the employee name does not start with 
+-- the character 'M'. The bonus of an employee is 0 otherwise.
+-- Return the result table ordered by employee_id.
+
+select 
+    employee_id,
+    case
+        when (employee_id % 2) <> 0
+            and name not like 'M%'
+            then salary
+        else 0
+        end as bonus
+from Employees
+order by employee_id;
+
+-- Problem 627: Swap Salary
+-- Write an SQL query to swap all 'f' and 'm' values (i.e., change all 
+-- 'f' values to 'm' and vice versa) with a single update statement 
+-- and no intermediate temporary tables.
+
+update Salary 
+set sex =
+    case 
+        when sex = 'm' then 'f'
+        when sex = 'f' then 'm'
+end;
+
+-- Problem 196: Delete Duplicate Emails
+-- Write an SQL query to delete all the duplicate emails, keeping only 
+-- one unique email with the smallest id. Note that you are supposed 
+-- to write a DELETE statement and not a SELECT one.
+
+delete t1 from Person t1
+inner join Person t2
+where
+    t1.id > t2.id
+    and t1.email = t2.email;
+
+-- Problem 1667: Fix Names in a Table
+-- Write an SQL query to fix the names so that only the first character 
+-- is uppercase and the rest are lowercase.
+-- Return the result table ordered by user_id.
+
+select
+    user_id,
+    concat(upper(substr(name, 1, 1)), 
+        lower(substr(name, 2, length(name) - 1))) as name
+from Users
+order by user_id;
+
+-- Problem 1484: Group Sold Products By The Date
+-- Write an SQL query to find for each date the number of different 
+-- products sold and their names.
+-- The sold products names for each date should be sorted lexicographically.
+-- Return the result table ordered by sell_date.
+
+select
+    sell_date,
+    count(distinct(product)) as num_sold,
+    group_concat(distinct(product) separator ',') as products
+from Activities
+group by sell_date
+order by sell_date, products; 
+
+-- Problem 1527: Patients With a Condition
+-- Write an SQL query to report the patient_id, patient_name and conditions 
+-- of the patients who have Type I Diabetes. 
+-- Type I Diabetes always starts with DIAB1 prefix.
+
+select
+    patient_id, 
+    patient_name, 
+    conditions
+from Patients
+where conditions like 'DIAB1%'
+    or conditions like '% DIAB1%';
+
+-- Problem 1965: Employees With Missing Information
+-- Write an SQL query to report the IDs of all the employees with missing
+-- information. The information of an employee is missing if 1) the employee's
+-- name is missing, or 2) the employee's salary is missing. 
+-- Return the result table ordered by employee_id in ascending order.
+
+select
+    e.employee_id
+from Employees as e
+left join Salaries as s
+on e.employee_id = s.employee_id
+    where s.salary is null
+union
+select 
+    s.employee_id
+from Salaries as s
+left join Employees as e
+on s.employee_id = e.employee_id
+    where e.name is null
+order by employee_id;
+
+-- Problem 1795: Rearrange Products Table
+-- Write an SQL query to rearrange the Products table so that each row
+-- has (product_id, store, price). If a product is not available in a
+-- store, do not include a row with that product_id and store combination
+-- in the result table. 
+-- Return the result table in any order.
+
+select
+    product_id,
+    'store1' as store,
+    store1 as price
+from Products
+where store1 is not null
+union
+select
+    product_id,
+    'store2' as store,
+    store2 as price
+from Products
+where store2 is not null
+union
+select
+    product_id,
+    'store3' as store,
+    store3 as price
+from Products
+where store3 is not null
+order by product_id;
+
+-- Problem 608: Tree Node
+-- Write an SQL query to report the type of each node in the tree.
+-- Return the result table in any order. 
+
+select 
+    id, 
+    case 
+        when p_id is null then 'Root'
+        when id in (select p_id from Tree) then 'Inner'
+        else 'Leaf'
+    end as type
+from Tree;
+
+-- Problem 176: Second Highest Salary
+-- Write an SQL query to report the second highest salary from
+-- the Employee table. If there is no second highest salary,
+-- the query should report null. 
+
+select ifnull(
+    null,
+    (
+    select 
+        distinct salary
+    from Employee
+    order by salary desc
+    limit 1, 1)
+) as SecondHighestsalary;
+
+-- Problem 175: Combine Two Tables
+-- Write an SQL query to report the first name, last name, city,
+-- and state of each person in the Person table. If the address 
+-- of a personID is not present in the Address table, report
+-- null instead.
+
+select
+    p.firstName,
+    p.lastName,
+    a.city,
+    a.state
+from Person as p
+left join Address as a
+on p.personId = a.personId;
+
+-- Problem 1581: Customer Who Visited but Did Not Make Any Transactions
+-- Write a SQL query to find the IDs of the users who visited without
+-- making any transactions and the number of times they made these
+-- types of visits. 
+-- Return the result table sorted in any order.
+
+select
+    v.customer_id,
+    count(v.visit_id) as count_no_trans
+from Visits as v
+left join Transactions as T
+on v.visit_id = t.visit_id
+where v.visit_id not in (
+    select visit_id from Transactions
+)
+group by v.customer_id;
+
+-- Problem 1148: Article Views I
+-- Write an SQL query to find all the authors that viewed at least one
+-- of their own articles. 
+-- Return the result table sorted by id in ascending order. 
+
+select 
+    distinct author_id as id
+from Views
+where author_id = viewer_id
+order by author_id;
+
+-- Problem 197: Rising Temperature
+-- Write an SQL query to find all dates' id with higher temperatures
+-- compared to its previous dates (yesterday). 
+-- Return the result table in any order.
+
+select
+    new.id
+from weather as new
+join weather as old
+on new.temperature > old.temperature
+    and datediff(new.recordDate, old.recordDate) = 1;
+
+-- Problem 1683: Invalid Tweets
+-- Write an SQL query to find the IDs of the invalid tweets. The tweet
+-- is invalid if the number of characters used in the content of the
+-- tweet is strictly greater than 15. 
+-- Return the result table in any order. 
+
+select 
+    tweet_id
+from Tweets
+where length(content) > 15;
+
+-- Problem 1378: Replace Employee ID with the Unique Identifier
+-- Write an SQL query to show the unique ID of each user. If a user
+-- does not have a unique ID in place, just show 'null.' 
+-- Return the result table in any order. 
+
+select 
+    ifnull(u.unique_id, null) as unique_id,
+    e.name
+from Employees as e
+left join EmployeeUNI as u
+on e.id = u.id;
+
+-- Problem 1068: Product Sales Analysis I
+-- Write an SQL query that reports the product_name, year, and price
+-- for each sale_id in the Sales table. 
+-- Return the resulting table in any order. 
+
+select
+    p.product_name, 
+    s.year,
+    s.price 
+from Sales as s
+join Product as p
+on s.product_id = p.product_id;
