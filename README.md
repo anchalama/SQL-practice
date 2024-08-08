@@ -1,2 +1,2 @@
 # SQL-practice
-Anchala Maheshwari- Data Analyst Portfolio 
+SQL practice problems found around the web.
